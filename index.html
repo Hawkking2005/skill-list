@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .form-container {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0 15px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      color: #555;
+      cursor: pointer;
+    }
+
+    .radio-group input[type="radio"] {
+      margin-right: 5px;
+      width: auto;
+      height: auto;
+    }
+
+    /* Checkbox group styled inline */
+    .checkbox-group {
+      display: flex;
+      gap: 15px;            /* space between checkboxes */
+      flex-wrap: wrap;      /* wrap if small screen */
+      margin-bottom: 20px;
+    }
+
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      color: #555;
+      cursor: pointer;
+      white-space: nowrap; /* prevent breaking label text */
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      margin-right: 6px;
+      width: auto;
+      height: auto;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      background-color: #007bff;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #0056b3;
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .message.success {
+      color: green;
+    }
+
+    .message.error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Student Details</h2>
+    <form id="studentForm">
+      <input type="text" name="name" placeholder="Name" required />
+      <input type="text" name="rollno" placeholder="Roll No" required />
+
+      <div class="radio-group">
+        <label><input type="radio" name="gender" value="Male" required /> Male</label>
+        <label><input type="radio" name="gender" value="Female" /> Female</label>
+      </div>
+
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="skills" value="JavaScript" /> JavaScript</label>
+        <label><input type="checkbox" name="skills" value="Python" /> Python</label>
+        <label><input type="checkbox" name="skills" value="Java" /> Java</label>
+        <label><input type="checkbox" name="skills" value="C++" /> C++</label>
+        <label><input type="checkbox" name="skills" value="HTML" /> HTML</label>
+      </div>
+
+      <button type="submit">Submit</button>
+
+      <div class="message" id="formMessage"></div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('studentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const form = e.target;
+      const formData = new FormData(form);
+
+      // Get all checked skills as an array
+      const skills = formData.getAll('skills');
+
+      // Build data object
+      const data = {
+        name: formData.get('name').trim(),
+        rollno: formData.get('rollno').trim(),
+        gender: formData.get('gender'),
+        skills: skills
+      };
+
+      const messageDiv = document.getElementById('formMessage');
+      messageDiv.textContent = '';
+      messageDiv.className = 'message';
+
+      try {
+        const res = await fetch('/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          throw new Error(result.message || 'Unknown error');
+        }
+
+        messageDiv.textContent = result.message;
+        messageDiv.classList.add('success');
+
+        form.reset();
+      } catch (err) {
+        console.error('Submission error:', err);
+        messageDiv.textContent = err.message || 'There was an issue submitting the form.';
+        messageDiv.classList.add('error');
+      }
+    });
+  </script>
+</body>
+</html>
