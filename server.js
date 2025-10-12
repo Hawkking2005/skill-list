@@ -7,10 +7,10 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json()); // replaces body-parser
+app.use(express.json());
 
-// Serve static files from 'public' folder
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files from the root directory
+app.use(express.static(__dirname));
 
 // MongoDB Atlas connection
 const mongoURI = 'mongodb+srv://bhargavkolluru2005_db_user:Swathi1@cluster0.vzysljb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
@@ -19,8 +19,8 @@ mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 // Schema and model
 const studentSchema = new mongoose.Schema({
@@ -34,7 +34,7 @@ const Student = mongoose.model('Student', studentSchema);
 
 // Serve index.html at root
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Handle form submission
@@ -71,4 +71,4 @@ app.get('/students', async (req, res) => {
 
 // Dynamic port for Render
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
